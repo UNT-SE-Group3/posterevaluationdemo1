@@ -8,7 +8,6 @@ import pytesseract
 from pytesseract import Output
 import numpy as np
 
-
 CONFIDENCE_THRESHOLD = 60
 
 def load_image(image_path):
@@ -20,7 +19,7 @@ def load_image(image_path):
 def extract_text(image):
    
     text = pytesseract.image_to_string(image, output_type=Output.STRING)
-    return text.lower()  
+    return text.lower() 
 
 def assess_common_words(text):
   
@@ -50,7 +49,7 @@ def detect_title(image):
     return title_score
 
 def detect_images_and_graphs(image):
-
+   
     non_text_area = cv2.subtract(255, cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
     _, non_text_area = cv2.threshold(non_text_area, 128, 255, cv2.THRESH_BINARY)
     non_text_pixels = cv2.countNonZero(non_text_area)
@@ -61,7 +60,7 @@ def detect_images_and_graphs(image):
         return 0
 
 def detect_logo(image):
-    
+ 
     logo_region = image[:100, -100:]
     gray_logo = cv2.cvtColor(logo_region, cv2.COLOR_BGR2GRAY)
     _, binary_logo = cv2.threshold(gray_logo, 128, 255, cv2.THRESH_BINARY)
@@ -98,6 +97,5 @@ iface = gr.Interface(
     inputs=gr.Image(shape=(None, None), image_mode='RGB', label="Upload Image"),  
     outputs=gr.outputs.JSON(label="Scores")
 )
-
 
 iface.launch()
