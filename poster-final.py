@@ -8,6 +8,7 @@ import cv2
 import pytesseract
 from pytesseract import Output
 import numpy as np
+import json
 
 # Constants and Configurations
 CONFIDENCE_THRESHOLD = 60
@@ -23,9 +24,9 @@ def extract_text(image):
     text = pytesseract.image_to_string(image, output_type=Output.STRING)
     return text.lower()  # Convert text to lowercase for easier comparison
 
-def assess_common_words(text):
+def assess_common_words(text, common_words):
+    
     # Count the number of common words present in the text without duplicates
-    common_words = ['introduction', 'objective', 'results', 'conclusion', 'further', 'scope', 'acknowledgments', 'hypothesis', 'abstract', 'Abstract', 'methodology', 'discussion', 'references', 'literature', 'review', 'data', 'analysis', 'experiment', 'materials', 'method', 'figure', 'table', 'figure', 'table', 'discussion', 'appendix', 'author', 'presentation']
     unique_common_words = set(common_words)
     word_count = len([word for word in text.split() if word in unique_common_words])
     score = word_count * 3
@@ -73,14 +74,14 @@ def detect_logo(image):
         return 10
     else:
         return 0
-def predict(image):
+def predict(image, common_words):
     # Process the image directly without reading from file
     # Since we're using 'numpy' type for the Gradio input, the 'image' is now a numpy array
     img_np = image
 
     text = extract_text(img_np)
 
-    common_words_score = assess_common_words(text)
+    common_words_score = assess_common_words(text, common_words)
     title_score = detect_title(img_np)
     images_and_graphs_score = detect_images_and_graphs(img_np)
     logo_score = detect_logo(img_np)
@@ -98,7 +99,10 @@ def predict(image):
 
 if __name__ == "__main__":
     image = load_image("sample.jpeg")
-    x = predict(image)
+    with open("config.json", 'r') as json_file:
+        data = json.load(json_file)
+        common_words = data["common_words"]
+    x = predict(image, common_words)
     print(x)
 
 # # Create the Gradio interface
