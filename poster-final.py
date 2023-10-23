@@ -13,6 +13,31 @@ import json
 # Constants and Configurations
 CONFIDENCE_THRESHOLD = 60
 
+def is_valid_image(image):
+    """
+    Check if the image is valid based on size and format.
+
+    Args:
+        image (numpy.ndarray): The input image as a NumPy array.
+
+    Returns:
+        bool: True if the image is valid; False otherwise.
+    """
+
+    # Check the image dimensions
+    min_height = 100
+    min_width = 100
+
+    max_height = 10000
+    max_width = 10000
+
+    if image.shape[0] < min_height or image.shape[1] < min_width:
+        return False
+    if image.shape[0] > max_height or image.shape[1] > max_width:
+        return False
+
+    return True
+
 # Function to load an image from a file
 def load_image(image_path):
     """
@@ -29,6 +54,8 @@ def load_image(image_path):
     image = cv2.imread(image_path)
     if image is None:
         raise Exception("Error loading image")
+    if not is_valid_image(image):
+        raise Exception("Not a valid image.")
     return image
 
 def extract_text(image):
