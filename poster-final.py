@@ -194,10 +194,13 @@ def predict(image, common_words):
 
 if __name__ == "__main__":
     image = load_image("sample.jpeg")
+    all_common_words = []
     with open("config.json", 'r') as json_file:
         data = json.load(json_file)
-        common_words = data["common_words"]
-    x = predict(image, common_words)
+        for lang, words in data.items():
+            all_common_words.extend(words)
+
+    x = predict(image, all_common_words)
     print(x)
 
 # # Create the Gradio interface
