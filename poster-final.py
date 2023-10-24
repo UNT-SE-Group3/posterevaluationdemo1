@@ -28,6 +28,8 @@ def is_valid_image(image):
 
     Returns:
         bool: True if the image is valid; False otherwise.
+    Raises:
+        Exception: if the provided image is not in BGR format then exception will be raised.
     """
 
     # Check the image dimensions
@@ -41,6 +43,8 @@ def is_valid_image(image):
         return False
     if image.shape[0] > max_height or image.shape[1] > max_width:
         return False
+    if image.shape[-1] != 3 or image.shape[-2] != 3:
+        raise Exception("Image format is not BGR.")
 
     return True
 
