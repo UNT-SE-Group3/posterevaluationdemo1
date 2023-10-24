@@ -2,6 +2,11 @@
 # !pip install opencv-python-headless
 # !pip install pytesseract
 # !sudo apt install tesseract-ocr
+# To install tesseract-ocr in windows machine download exe file from  https://github.com/UB-Mannheim/tesseract/wiki.
+# To install tesseract in debian based linux distros follow the steps below
+#yum-config-manager --add-repo https://download.opensuse.org/repositories/home:/Alexander_Pozdnyakov/CentOS_7/
+#yum update
+#yum install tesseract 
 
 import gradio as gr
 import cv2
