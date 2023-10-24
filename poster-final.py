@@ -15,6 +15,7 @@ from pytesseract import Output
 import numpy as np
 import json
 import multiprocessing
+from flask import Flask, request, jsonify
 
 # Constants and Configurations
 CONFIDENCE_THRESHOLD = 60
@@ -203,17 +204,38 @@ def predict(image, common_words):
     return ret_dict
 
 
-if __name__ == "__main__":
-    image = load_image("sample.jpeg")
-    all_common_words = []
-    with open("config.json", 'r') as json_file:
-        data = json.load(json_file)
-        for lang, words in data.items():
-            all_common_words.extend(words)
+# if __name__ == "__main__":
+#     image = load_image("sample.jpeg")
+#     all_common_words = []
+#     with open("config.json", 'r') as json_file:
+#         data = json.load(json_file)
+#         for lang, words in data.items():
+#             all_common_words.extend(words)
 
-    process = multiprocessing.Process(target=predict, args=(image, all_common_words,))
-    process.start()
-    process.join()
+#     process = multiprocessing.Process(target=predict, args=(image, all_common_words,))
+#     process.start()
+#     process.join()
+
+@app.route('/analyze', methods=['POST'])
+def analyze_image():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file provided'}), 400
+
+    image_file = request.files['file']
+
+    if image_file and is_valid_image(image):
+        image = load_image(image_file)
+        
+        all_common_words = []
+        with open("config.json", 'r') as json_file:
+            data = json.load(json_file)
+            for lang, words in data.items():
+                all_common_words.extend(words)
+        
+        result = predict(image, all_common_words)
+        return jsonify(result)
+    else:
+        return jsonify({'error': 'Invalid image format or size'}), 400
 
 # # Create the Gradio interface
 # iface = gr.Interface(
