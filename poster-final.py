@@ -9,6 +9,7 @@ import pytesseract
 from pytesseract import Output
 import numpy as np
 import json
+import multiprocessing
 
 # Constants and Configurations
 CONFIDENCE_THRESHOLD = 60
@@ -182,14 +183,15 @@ def predict(image, common_words):
     logo_score = detect_logo(img_np)
 
     total_score = common_words_score + title_score + images_and_graphs_score + logo_score
-
-    return {
+    ret_dict = {
         "Common Words Score": common_words_score,
         "Title Score": title_score,
         "Images and Graphs Score": images_and_graphs_score,
         "Logo Score": logo_score,
         "Total Score": total_score
     }
+    print(ret_dict)
+    return ret_dict
 
 
 if __name__ == "__main__":
@@ -200,8 +202,9 @@ if __name__ == "__main__":
         for lang, words in data.items():
             all_common_words.extend(words)
 
-    x = predict(image, all_common_words)
-    print(x)
+    process = multiprocessing.Process(target=predict, args=(image, all_common_words,))
+    process.start()
+    process.join()
 
 # # Create the Gradio interface
 # iface = gr.Interface(
