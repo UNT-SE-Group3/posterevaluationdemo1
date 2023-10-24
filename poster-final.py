@@ -16,7 +16,7 @@ from pytesseract import Output, image_to_string
 import numpy as np
 import json
 import multiprocessing
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 
 app = Flask(__name__)
 # Constants and Configurations
@@ -46,8 +46,6 @@ def is_valid_image(image):
         return False
     if image.shape[0] > max_height or image.shape[1] > max_width:
         return False
-    if image.shape[-1] != 3 or image.shape[-2] != 3:
-        raise Exception("Image format is not BGR.")
 
     return True
 
@@ -223,11 +221,11 @@ def predict(image, common_words):
 def analyze_image():
     if 'file' not in request.files:
         return jsonify({'error': 'No file provided'}), 400
+    nparr = np.frombuffer(request.files['file'].read(), np.uint8)
 
-    image_file = request.files['file']
+    image_file = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    if image_file and is_valid_image(image_file):
-        image = load_image(image_file)
+    if is_valid_image(image_file):
         
         all_common_words = []
         with open("config.json", 'r') as json_file:
@@ -235,10 +233,18 @@ def analyze_image():
             for lang, words in data.items():
                 all_common_words.extend(words)
         
-        result = predict(image, all_common_words)
+        result = predict(image_file, all_common_words)
         return jsonify(result)
     else:
         return jsonify({'error': 'Invalid image format or size'}), 400
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def catch_all(path):
+    return send_file('help-image.png', mimetype='image/gif')
+    
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)
 
 # # Create the Gradio interface
 # iface = gr.Interface(
