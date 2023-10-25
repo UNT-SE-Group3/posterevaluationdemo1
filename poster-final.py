@@ -243,15 +243,24 @@ def analyze_image():
 def catch_all(path):
     return send_file('help-image.png', mimetype='image/gif')
     
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080, debug=True)
+#if __name__ == "__main__":
+    #app.run(host="0.0.0.0", port=8080, debug=True)
 
-# # Create the Gradio interface
-# iface = gr.Interface(
-#     fn=predict,
-#     inputs=gr.Image(shape=(None, None), image_mode='RGB', label="Upload Image"),  # Adjusted input parameters
-#     outputs=gr.outputs.JSON(label="Scores")
-# )
+all_common_words = []
+with open("config.json", 'r') as json_file:
+  data = json.load(json_file)
+  for lang, words in data.items():
+    all_common_words.extend(words)
 
-# # Run the interface
-# iface.launch()
+def predictnew(image, common_words):
+  return predict(image, all_common_words)
+
+# Create the Gradio interface
+iface = gr.Interface(
+    fn=predictnew,
+    inputs=gr.Image(shape=(None, None), image_mode='RGB', label="Upload Image"), # Adjusted input parameters
+    outputs=gr.outputs.JSON(label="Scores")
+)
+
+# Run the interface
+iface.launch()
