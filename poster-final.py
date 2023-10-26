@@ -227,7 +227,6 @@ def analyze_image():
 
     image_file = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     if is_valid_image(image_file):
-        all_common_words = load_common_words()
         result = predict(image_file)
         return jsonify(result)
     else:
@@ -241,8 +240,7 @@ def catch_all(path):
 #if __name__ == "__main__":
     #app.run(host="0.0.0.0", port=8080, debug=True)
 
-all_common_words = []
-
+common_words = load_common_words()
 
 def predictnew(image, common_words):
   return predict(image, all_common_words)
