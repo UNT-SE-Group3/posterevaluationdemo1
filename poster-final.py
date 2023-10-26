@@ -217,6 +217,15 @@ def predict(image, common_words):
 #     process.start()
 #     process.join()
 
+
+def load_common_words():
+    all_common_words = []
+    with open("config.json", 'r') as json_file:
+    data = json.load(json_file)
+    for lang, words in data.items():
+        all_common_words.extend(words)
+    return all_common_words
+    
 @app.route('/analyze', methods=['POST'])
 def analyze_image():
     if 'file' not in request.files:
@@ -224,16 +233,9 @@ def analyze_image():
     nparr = np.frombuffer(request.files['file'].read(), np.uint8)
 
     image_file = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
     if is_valid_image(image_file):
-        
-        all_common_words = []
-        with open("config.json", 'r') as json_file:
-            data = json.load(json_file)
-            for lang, words in data.items():
-                all_common_words.extend(words)
-        
-        result = predict(image_file, all_common_words)
+        all_common_words = load_common_words()
+        result = predict(image_file)
         return jsonify(result)
     else:
         return jsonify({'error': 'Invalid image format or size'}), 400
@@ -247,10 +249,7 @@ def catch_all(path):
     #app.run(host="0.0.0.0", port=8080, debug=True)
 
 all_common_words = []
-with open("config.json", 'r') as json_file:
-  data = json.load(json_file)
-  for lang, words in data.items():
-    all_common_words.extend(words)
+
 
 def predictnew(image, common_words):
   return predict(image, all_common_words)
