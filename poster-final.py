@@ -227,7 +227,8 @@ def analyze_image():
 
     image_file = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     if is_valid_image(image_file):
-        result = predict(image_file)
+        common_words = load_common_words()
+        result = predict(image_file, common_words)
         return jsonify(result)
     else:
         return jsonify({'error': 'Invalid image format or size'}), 400
