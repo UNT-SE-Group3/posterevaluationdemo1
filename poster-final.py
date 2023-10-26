@@ -144,11 +144,7 @@ def detect_images_and_graphs(image):
     non_text_area = cv2.subtract(255, cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
     _, non_text_area = cv2.threshold(non_text_area, 128, 255, cv2.THRESH_BINARY)
     non_text_pixels = cv2.countNonZero(non_text_area)
-
-    if non_text_pixels > 0:
-        return 10
-    else:
-        return 0
+    return 10 if non_text_pixels > 0 else 0
 
 def detect_logo(image):
     """
@@ -166,11 +162,8 @@ def detect_logo(image):
     gray_logo = cv2.cvtColor(logo_region, cv2.COLOR_BGR2GRAY)
     _, binary_logo = cv2.threshold(gray_logo, 128, 255, cv2.THRESH_BINARY)
     non_zero_pixels = cv2.countNonZero(binary_logo)
-
-    if non_zero_pixels > 0:
-        return 10
-    else:
-        return 0
+    return 10 if non_zero_pixels > 0 else 0
+    
 def predict(image, common_words):
     """
     Predict assessment scores based on image analysis.
